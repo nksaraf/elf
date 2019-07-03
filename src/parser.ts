@@ -38,7 +38,6 @@ const fix_runfile = (runfile: cosmiconfig.Config): RunFile => {
 
 export default (filepath: string = ''): RunFile => {
   let sources;
-
   if (filepath !== undefined && filepath.length > 0 && fs.existsSync(filepath)) {
     sources = [filepath, ...RUN_SOURCES];
   } else {
