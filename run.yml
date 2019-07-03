@@ -5,12 +5,11 @@ deploy:
 
 hello:
   - print: '${hello}'
-  - clean
-
-clean:
-  - print clean
+  - watch: print hello
 
 env:
   hello: world
-  path:
-    l: exa -al
+  nodemon: node_modules/.bin/nodemon
+
+path:
+  watch: ${nodemon} --exec run
