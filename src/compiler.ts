@@ -2,22 +2,12 @@
 import _ from 'lodash';
 import { RunFile, Command, Environment } from './types';
 
-const BASE_PATH = {
-  print: 'echo',
-  error: 'echo'
-};
-
-const BASE_ENV = {
-  path: BASE_PATH
-};
-
 const RUN_PATH = ['run'];
 
 const isInRunPath = (command: string) => Boolean(RUN_PATH.find(run_path => run_path === command));
 
 export default (runfile: RunFile) => {
-  const { env: user_env, ...tasks } = runfile;
-  const env: Environment = _.merge(BASE_ENV, user_env);
+  const { env, ...tasks } = runfile;
   for (const task_name in tasks) {
     env.path[task_name] = {
       name: task_name,

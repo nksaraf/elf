@@ -20,8 +20,9 @@ const isValidCommandArray = (val: object) =>
 
 const fix_runfile = (runfile: cosmiconfig.Config): RunFile => {
   assert(runfile);
-  const { env = {}, ...tasks } = runfile;
-  const { path, ...vars } = env;
+  const { env = {}, path = {}, ...tasks } = runfile;
+  const { path: env_path = {}, ...vars } = env;
+
   assert(Object.values(vars).every((val: any) => val.toString()));
 
   assert(
@@ -31,7 +32,10 @@ const fix_runfile = (runfile: cosmiconfig.Config): RunFile => {
   );
 
   return {
-    env: { path: Object.assign({}, path), ...vars },
+    env: {
+      path: Object.assign({}, path, env_path),
+      vars
+    },
     ...tasks
   };
 };

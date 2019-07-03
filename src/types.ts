@@ -9,12 +9,12 @@ export interface Task {
 }
 
 export interface Path {
-  [key: string]: string | Task;
+  [key: string]: string | Task | ((args: string) => void);
 }
 
 export interface Environment {
   path: Path;
-  [key: string]: string | object | any;
+  vars: { [key: string]: string | object | any };
 }
 
 export interface RunFile {

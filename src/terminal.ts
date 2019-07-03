@@ -1,21 +1,31 @@
 import { Environment, Task, Command, Terminal } from './types';
 import _ from 'lodash';
 import crossSpawn from 'cross-spawn';
+import yargsParser from 'yargs-parser';
+
 import log, { log_task } from './logger';
-import yargsParser = require('yargs-parser');
+
+import STD_ENV from './env';
 
 enum CommandType {
   Task,
   Alias,
+  Func,
   Other,
   Error
 }
 
 const command_type = (command: string, env: Environment) => {
-  if (_.isObject(env.path[command]) && 'name' in (env.path[command] as Task)) {
+  if (
+    _.isObject(env.path[command]) &&
+    !_.isFunction(env.path[command]) &&
+    'name' in (env.path[command] as Task)
+  ) {
     return CommandType.Task;
   } else if (_.isString(env.path[command])) {
     return CommandType.Alias;
+  } else if (_.isFunction(env.path[command])) {
+    return CommandType.Func;
   } else if (_.isString(command)) {
     return CommandType.Other;
   } else {
@@ -25,8 +35,8 @@ const command_type = (command: string, env: Environment) => {
 
 const exec = ({ command, args }: Command, env: Environment) => {
   const filled_command = {
-    command: template(command, env),
-    args: template(args, env)
+    command: template(command, env.vars),
+    args: template(args, env.vars)
   };
   log(filled_command);
   const full_command = `${filled_command.command} ${filled_command.args}`;
@@ -40,13 +50,13 @@ const run = ({ command, args }: Command, env: Environment) => {
   try {
     run_command({ command, args }, env, 0, []);
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   }
 };
 
-const template = (content: string, env: Environment) => {
-  const func = new Function(...Object.keys(env), 'return `' + content + '`;');
-  return func.call(null, ...Object.values(env));
+const template = (content: string, vars: object) => {
+  const func = new Function(...Object.keys(vars), 'return `' + content + '`;');
+  return func.call(null, ...Object.values(vars));
 };
 
 const run_command = (
@@ -62,6 +72,8 @@ const run_command = (
     run_task(env.path[command] as Task, args, env, depth, history);
   } else if (type === CommandType.Other) {
     return exec({ command, args }, env);
+  } else if (type === CommandType.Func) {
+    (env.path[command] as Function)(args);
   } else if (type === CommandType.Error) {
     throw new Error('Command not found');
   }
@@ -81,22 +93,27 @@ const run_task = (
   depth: number,
   history: string[]
 ) => {
-  if (depth > 5 || history.find(item => item === name)) {
+  if (depth > MAX_DEPTH || history.find(item => item === name)) {
     throw new Error('Cycle detected in dependencies or gone too deep');
   }
   log_task(name, args);
 
   const { _, $0, ...task_args } = yargsParser(args);
   for (let i = 0; i < commands.length; i += 1) {
-    run_command(commands[i], { ...env, ...task_args }, depth + 1, history.concat([name]));
+    run_command(
+      commands[i],
+      { path: env.path, vars: { ...env.vars, ...task_args } },
+      depth + 1,
+      history.concat([name])
+    );
   }
 };
 
 const list = (env: Environment) =>
   Object.values(env.path).filter(value => _.isObject(value) && 'name' in (value as Task)) as Task[];
 
-export default (e: Environment): Terminal => {
-  const env = { ...e };
+export default (env: Environment): Terminal => {
+  env = _.merge(STD_ENV, env);
   return {
     run: ({ command, args }: Command) => run({ command, args }, env),
     list: () => list(env)

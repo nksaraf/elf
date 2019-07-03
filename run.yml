@@ -1,7 +1,7 @@
 deploy:
-  - hello
-  # - npm: run build
-  # - npm: link
+  - print Deploying
+  - npm: run build
+  - npm: link
 
 hello:
   - print: '${hello}'
