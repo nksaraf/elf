@@ -21,3 +21,12 @@ export interface RunFile {
   env: Environment;
   [key: string]: string | object | (string | object)[];
 }
+
+export interface Terminal {
+  run: ({ command, args }: Command) => void;
+  list: () => Task[];
+}
+
+export interface Interpreter {
+  (tokens: string[]): void;
+}

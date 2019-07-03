@@ -1,44 +1,39 @@
 import yargs from 'yargs';
 import repl, { select_task } from './repl';
+import { Terminal, Interpreter } from './types';
 
-export default (machine: any) => {
+export default (terminal: Terminal): Interpreter => {
   return (tokens: string[]) =>
     yargs
       .command(['repl', 'r'], 'Run repl', {}, (argv: any) => {
-        repl(machine);
+        repl(terminal);
       })
       .command(['task [task]', 'run', '$0'], 'Run specified task', {}, (argv: any) => {
         if (argv.task) {
-          machine.run({
+          terminal.run({
             command: argv.task,
             args: process.argv
               .slice(process.argv.findIndex(item => item === argv.task) + 1)
               .join(' ')
           });
         } else {
-          select_task(machine).then(task =>
-            machine.run({
+          select_task(terminal).then(task =>
+            terminal.run({
               command: task,
               args: ''
             })
           );
         }
       })
-      .command('list', 'Show list of tasks', {}, () => {
-        console.log(machine.list().join('\n'));
+      .command(['list', 'ls'], 'Show list of tasks', {}, () => {
+        console.log(
+          terminal
+            .list()
+            .map(({ name }) => name)
+            .join('\n')
+        );
       })
       .help()
       .demandCommand()
       .parse(tokens);
 };
-
-// const execute = (env, args) => {
-//   yargs
-// }
-
-// export default (_env: Environment) => {
-//   const env = { ..._env };
-//   return (args) => {
-//     yargs.
-//   }
-// };

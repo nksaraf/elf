@@ -19,7 +19,7 @@ let colors: { [key: string]: (value: string) => string } = {
   js: chalk.magenta,
   option: chalk.blue,
   flag: chalk.cyan,
-  positional: chalk.yellowBright
+  positional: chalk.yellow
 };
 
 const colored_token = ({ type, value }: Token) => colors[type!](value!);

@@ -1,4 +1,4 @@
-import { Environment, Task, Command } from './types';
+import { Environment, Task, Command, Terminal } from './types';
 import _ from 'lodash';
 import crossSpawn from 'cross-spawn';
 import log from './logger';
@@ -88,15 +88,12 @@ const run_task = (
 };
 
 const list = (env: Environment) =>
-  Object.keys(env.path).filter(
-    command => _.isObject(env.path[command]) && 'name' in (env.path[command] as Task)
-  );
+  Object.values(env.path).filter(value => _.isObject(value) && 'name' in (value as Task)) as Task[];
 
-export default (e: Environment) => {
+export default (e: Environment): Terminal => {
   const env = { ...e };
   return {
     run: ({ command, args }: Command) => run({ command, args }, env),
-    list: () => list(env),
-    exec
+    list: () => list(env)
   };
 };

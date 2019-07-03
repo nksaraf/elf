@@ -2,12 +2,12 @@
 
 import parse from './parser';
 import compile from './compiler';
-import processor from './processor';
+import terminal from './terminal';
 import interpreter from './interpreter';
 
 const runfile = parse();
 const env = compile(runfile);
-const machine = processor(env);
-const interpret = interpreter(machine);
+const term = terminal(env);
+const interpret = interpreter(term);
 
 interpret(process.argv.slice(2));

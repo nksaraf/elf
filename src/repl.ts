@@ -1,8 +1,9 @@
 const { Input, AutoComplete } = require('enquirer');
 import interpreter from './interpreter';
+import { Terminal } from './types';
 
-export const select_task = async (machine: any) => {
-  const tasks = machine.list();
+export const select_task = async (terminal: Terminal) => {
+  const tasks = terminal.list().map(({ name }) => name);
   const prompt = new AutoComplete({
     name: 'task',
     message: 'Select task to run',
@@ -11,8 +12,8 @@ export const select_task = async (machine: any) => {
   return await prompt.run();
 };
 
-export default async (machine: any) => {
-  const interpret = interpreter(machine);
+export default async (terminal: any) => {
+  const interpret = interpreter(terminal);
   try {
     while (true) {
       const prompt = new REPLPrompt({
