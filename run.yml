@@ -1,0 +1,16 @@
+clean: rm -rf target
+
+run:
+  hello: 1 2 3
+
+build:
+  - print: Hello
+  - run: clean
+  - clean
+  - npm: build
+  - random:
+      print: Hello
+
+env:
+  path:
+    npm: npm run
