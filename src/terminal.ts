@@ -1,8 +1,7 @@
 import { Environment, Task, Command, Terminal } from './types';
 import _ from 'lodash';
 import crossSpawn from 'cross-spawn';
-import log from './logger';
-import yargs = require('yargs');
+import log, { log_task } from './logger';
 import yargsParser = require('yargs-parser');
 
 enum CommandType {
@@ -73,6 +72,8 @@ const run_alias = (alias: string, args: string, env: Environment) => {
   exec({ command, args: cmd_args.join(' ') }, env);
 };
 
+const MAX_DEPTH = 5;
+
 const run_task = (
   { name, commands }: Task,
   args: string,
@@ -80,9 +81,10 @@ const run_task = (
   depth: number,
   history: string[]
 ) => {
-  if (depth > 3 || history.find(item => item === name)) {
-    throw new Error('Too deep');
+  if (depth > 5 || history.find(item => item === name)) {
+    throw new Error('Cycle detected in dependencies or gone too deep');
   }
+  log_task(name, args);
 
   const { _, $0, ...task_args } = yargsParser(args);
   for (let i = 0; i < commands.length; i += 1) {

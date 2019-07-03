@@ -24,6 +24,12 @@ let colors: { [key: string]: (value: string) => string } = {
 
 const colored_token = ({ type, value }: Token) => colors[type!](value!);
 
+export const log_task = (name: string, args: string) => {
+  // lexer.reset(args);
+  // const tokens = Array.from(lexer);
+  // console.log('📋 ', chalk.magenta(name), tokens.map(colored_token).join(''));
+};
+
 export default ({ command, args }: Command) => {
   lexer.reset(args);
   const tokens = Array.from(lexer);
