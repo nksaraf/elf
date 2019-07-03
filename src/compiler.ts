@@ -36,21 +36,15 @@ const compile_task_body = (item: string | object | (string | object)[]): Command
   } else if (_.isObject(item)) {
     return compile_object(item);
   }
-  console.log('Could not compile item', item);
-  return [
-    {
-      command: 'error',
-      args: ['Could not compile']
-    }
-  ];
+  return [];
 };
 
 const compile_command = (command: string, args: string[]): Command => {
   if (isInRunPath(command)) {
     const [task, ...task_args] = args;
-    return { command: task, args: task_args };
+    return { command: task, args: task_args.join(' ') };
   }
-  return { command, args };
+  return { command, args: args.join(' ') };
 };
 
 const compile_string = (item: string) => {
@@ -72,5 +66,5 @@ const compile_object = (items: object) =>
     } else if (_.isObject(value)) {
       return compile_object(value);
     }
-    return [];
+    return [{ command: name, args: '' }];
   });

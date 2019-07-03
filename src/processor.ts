@@ -1,6 +1,7 @@
 import { Environment, Task, Command } from './types';
 import _ from 'lodash';
 import crossSpawn from 'cross-spawn';
+import log from './logger';
 
 enum CommandType {
   Task,
@@ -22,11 +23,15 @@ const command_type = (command: string, env: Environment) => {
 };
 
 const exec = ({ command, args }: Command, env: Environment) => {
-  const resolved_args = template(args.join(' '), env);
-  console.log('⚙️ ', command, resolved_args);
-  const { status } = crossSpawn.sync(command, resolved_args.split(' '), { stdio: 'inherit' });
-  if (status !== 0) {
-    throw new Error(`${command} failed with status code ${status}`);
+  const filled_command = {
+    command: template(command, env),
+    args: template(args, env)
+  };
+  log(filled_command);
+  const full_command = `${filled_command.command} ${filled_command.args}`;
+  const { status: code } = crossSpawn.sync(full_command, [], { stdio: 'inherit', shell: true });
+  if (code !== 0) {
+    throw new Error(`${command} failed with status code ${code}`);
   }
 };
 
@@ -34,7 +39,7 @@ const run = ({ command, args }: Command, env: Environment) => {
   try {
     run_command({ command, args }, env, 0, []);
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 };
 
@@ -61,14 +66,14 @@ const run_command = (
   }
 };
 
-const run_alias = (alias: string, args: string[], env: Environment) => {
-  const [command, ...cmd_args] = alias.split(' ').concat(args);
-  exec({ command, args: cmd_args }, env);
+const run_alias = (alias: string, args: string, env: Environment) => {
+  const [command, ...cmd_args] = [alias, args].join(' ').split(' ');
+  exec({ command, args: cmd_args.join(' ') }, env);
 };
 
 const run_task = (
   { name, commands }: Task,
-  argv: string[],
+  args: string,
   env: Environment,
   depth: number,
   history: string[]

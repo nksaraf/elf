@@ -11,13 +11,15 @@ export default (machine: any) => {
         if (argv.task) {
           machine.run({
             command: argv.task,
-            args: process.argv.slice(process.argv.findIndex(item => item === argv.task) + 1)
+            args: process.argv
+              .slice(process.argv.findIndex(item => item === argv.task) + 1)
+              .join(' ')
           });
         } else {
           select_task(machine).then(task =>
             machine.run({
               command: task,
-              args: []
+              args: ''
             })
           );
         }

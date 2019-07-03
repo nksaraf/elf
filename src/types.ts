@@ -1,6 +1,6 @@
 export interface Command {
   command: string;
-  args: string[];
+  args: string;
 }
 
 export interface Task {

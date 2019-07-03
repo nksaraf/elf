@@ -13,12 +13,13 @@ export const select_task = async (machine: any) => {
 
 export default async (machine: any) => {
   const interpret = interpreter(machine);
-  const prompt = new REPLPrompt({
-    name: 'command',
-    message: '> '
-  });
   try {
     while (true) {
+      const prompt = new REPLPrompt({
+        name: 'command',
+        message: '> '
+      });
+
       const command = await prompt.run();
       interpret(command.trim().split(' '));
     }

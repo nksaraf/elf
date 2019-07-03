@@ -3,7 +3,10 @@ deploy:
   - npm: link
 
 hello:
-  print: ${hello}
+  - print: '${hello}'
+  - l
 
 env:
   hello: world
+  path:
+    l: exa -al
