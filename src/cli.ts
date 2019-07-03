@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 import parse from './parser';
 import compile from './compiler';
 import processor from './processor';

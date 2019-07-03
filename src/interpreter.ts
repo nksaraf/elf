@@ -1,14 +1,26 @@
 import yargs from 'yargs';
+import repl, { select_task } from './repl';
 
 export default (machine: any) => {
   return (tokens: string[]) =>
     yargs
-      .boolean('repl')
-      .command(['task <task>', 'run', '$0'], 'Run specified task', {}, (argv: any) => {
-        machine.run({
-          command: argv.task,
-          args: process.argv.slice(process.argv.findIndex(item => item === argv.task) + 1)
-        });
+      .command(['repl', 'r'], 'Run repl', {}, (argv: any) => {
+        repl(machine);
+      })
+      .command(['task [task]', 'run', '$0'], 'Run specified task', {}, (argv: any) => {
+        if (argv.task) {
+          machine.run({
+            command: argv.task,
+            args: process.argv.slice(process.argv.findIndex(item => item === argv.task) + 1)
+          });
+        } else {
+          select_task(machine).then(task =>
+            machine.run({
+              command: task,
+              args: []
+            })
+          );
+        }
       })
       .command('list', 'Show list of tasks', {}, () => {
         console.log(machine.list().join('\n'));

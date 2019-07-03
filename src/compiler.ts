@@ -29,12 +29,12 @@ export default (runfile: RunFile) => {
 };
 
 const compile_task_body = (item: string | object | (string | object)[]): Command[] => {
-  if (typeof item === 'string') {
+  if (_.isString(item)) {
     return [compile_string(item)];
   } else if (_.isArrayLike(item)) {
     return compile_list(item);
-  } else if (_.isObjectLike(item)) {
-    return [];
+  } else if (_.isObject(item)) {
+    return compile_object(item);
   }
   console.log('Could not compile item', item);
   return [

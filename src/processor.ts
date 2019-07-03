@@ -21,8 +21,10 @@ const command_type = (command: string, env: Environment) => {
   }
 };
 
-const exec = ({ command, args }: Command) => {
-  const { status } = crossSpawn.sync(command, args, { stdio: 'inherit' });
+const exec = ({ command, args }: Command, env: Environment) => {
+  const resolved_args = template(args.join(' '), env);
+  console.log('⚙️ ', command, resolved_args);
+  const { status } = crossSpawn.sync(command, resolved_args.split(' '), { stdio: 'inherit' });
   if (status !== 0) {
     throw new Error(`${command} failed with status code ${status}`);
   }
@@ -34,6 +36,11 @@ const run = ({ command, args }: Command, env: Environment) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+const template = (content: string, env: Environment) => {
+  const func = new Function(...Object.keys(env), 'return `' + content + '`;');
+  return func.call(null, ...Object.values(env));
 };
 
 const run_command = (
@@ -48,7 +55,7 @@ const run_command = (
   } else if (type === CommandType.Task) {
     run_task(env.path[command] as Task, args, env, depth, history);
   } else if (type === CommandType.Other) {
-    return exec({ command, args });
+    return exec({ command, args }, env);
   } else if (type === CommandType.Error) {
     throw new Error('Command not found');
   }
@@ -56,7 +63,7 @@ const run_command = (
 
 const run_alias = (alias: string, args: string[], env: Environment) => {
   const [command, ...cmd_args] = alias.split(' ').concat(args);
-  exec({ command, args: cmd_args });
+  exec({ command, args: cmd_args }, env);
 };
 
 const run_task = (
@@ -69,6 +76,7 @@ const run_task = (
   if (depth > 3 || history.find(item => item === name)) {
     throw new Error('Too deep');
   }
+
   for (let i = 0; i < commands.length; i += 1) {
     run_command(commands[i], env, depth + 1, history.concat([name]));
   }

@@ -1,3 +1,9 @@
 deploy:
   - npm: run build
   - npm: link
+
+hello:
+  print: ${hello}
+
+env:
+  hello: world
