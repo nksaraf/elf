@@ -2,6 +2,8 @@ import { Environment, Task, Command, Terminal } from './types';
 import _ from 'lodash';
 import crossSpawn from 'cross-spawn';
 import log from './logger';
+import yargs = require('yargs');
+import yargsParser = require('yargs-parser');
 
 enum CommandType {
   Task,
@@ -82,8 +84,9 @@ const run_task = (
     throw new Error('Too deep');
   }
 
+  const { _, $0, ...task_args } = yargsParser(args);
   for (let i = 0; i < commands.length; i += 1) {
-    run_command(commands[i], env, depth + 1, history.concat([name]));
+    run_command(commands[i], { ...env, ...task_args }, depth + 1, history.concat([name]));
   }
 };
 

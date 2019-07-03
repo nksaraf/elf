@@ -14,7 +14,7 @@ export interface Path {
 
 export interface Environment {
   path: Path;
-  [key: string]: string | object;
+  [key: string]: string | object | any;
 }
 
 export interface RunFile {
