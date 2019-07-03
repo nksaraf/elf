@@ -73,7 +73,7 @@ const run_command = (
   } else if (type === CommandType.Other) {
     return exec({ command, args }, env);
   } else if (type === CommandType.Func) {
-    (env.path[command] as Function)(args);
+    (env.path[command] as Function)(template(args, env.vars));
   } else if (type === CommandType.Error) {
     throw new Error('Command not found');
   }
@@ -87,7 +87,7 @@ const run_alias = (alias: string, args: string, env: Environment) => {
 const MAX_DEPTH = 5;
 
 const run_task = (
-  { name, commands }: Task,
+  { name, commands, positional_args }: Task,
   args: string,
   env: Environment,
   depth: number,
@@ -99,10 +99,21 @@ const run_task = (
   log_task(name, args);
 
   const { _, $0, ...task_args } = yargsParser(args);
+  const positionals: { [key: string]: string } = {};
+  for (let i = 0; i < _.length; i++) {
+    if (i > positional_args.length) {
+      break;
+    }
+
+    for (let alias of Object.values(positional_args[i])[0]) {
+      positionals[alias] = _[i];
+    }
+  }
+
   for (let i = 0; i < commands.length; i += 1) {
     run_command(
       commands[i],
-      { path: env.path, vars: { ...env.vars, ...task_args } },
+      { path: env.path, vars: { ...env.vars, ...task_args, ...positionals } },
       depth + 1,
       history.concat([name])
     );
@@ -110,7 +121,9 @@ const run_task = (
 };
 
 const list = (env: Environment) =>
-  Object.values(env.path).filter(value => _.isObject(value) && 'name' in (value as Task)) as Task[];
+  Object.keys(env.path)
+    .filter(command => command_type(command, env) === CommandType.Task)
+    .map(command => env.path[command] as Task);
 
 export default (env: Environment): Terminal => {
   env = _.merge(STD_ENV, env);

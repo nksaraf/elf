@@ -3,9 +3,12 @@ export interface Command {
   args: string;
 }
 
+export type PositionalArgs = ({ required: string[] } | { optional: string[] })[];
+
 export interface Task {
   name: string;
   commands: Command[];
+  positional_args: PositionalArgs;
 }
 
 export interface Path {

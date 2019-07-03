@@ -5,6 +5,7 @@ import { Terminal, Interpreter } from './types';
 export default (terminal: Terminal): Interpreter => {
   return (tokens: string[]) =>
     yargs
+      .reset()
       .command(['repl', 'r'], 'Run repl', {}, (argv: any) => {
         repl(terminal);
       })
