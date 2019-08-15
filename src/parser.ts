@@ -24,7 +24,6 @@ const fix_runfile = (runfile: cosmiconfig.Config): RunFile => {
   const { path: env_path = {}, ...vars } = env;
 
   assert(Object.values(vars).every((val: any) => val.toString()));
-
   assert(
     Object.values(tasks).every(
       (val: any) => typeof val === 'string' || isValidCommandObject(val) || isValidCommandArray(val)
