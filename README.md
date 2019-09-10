@@ -15,10 +15,10 @@ dev: watch deploy elf
 
 env:
   name: elf
-  nodemon: node_modules/.bin/nodemon
 
 path:
-  watch: ${nodemon} --exec run
+  watch: npx nodemon --exec run
+  edit: code
 ```
 
 Command to run:
@@ -26,4 +26,5 @@ Command to run:
 run deploy proj
 run watch npm run dev
 run dev
+run edit README.md
 ```
