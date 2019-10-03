@@ -6,11 +6,10 @@
     "checkJs": false,
     "outDir": "dist",
     "esModuleInterop": true,
-    "strict": true,
+    "strict": false,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "noImplicitAny": false
   },
-  "files": [
-    "src/cli.ts"
-  ]
+  "files": ["src/index.ts"]
 }
