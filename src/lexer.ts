@@ -1,7 +1,6 @@
 import moo from 'moo';
-import { readFileSync } from 'fs';
 
-const peekable = (lexer: moo.Lexer) => {
+export function peekable(lexer: moo.Lexer) {
   let here: moo.Token | undefined;
 
   const reset = (source: string, state?: moo.LexerState) => {
@@ -50,7 +49,7 @@ const peekable = (lexer: moo.Lexer) => {
     reset,
     save
   };
-};
+}
 
 const lex = {
   ws: /[ \t]+/,
@@ -66,7 +65,7 @@ const lex = {
 
 const types = ['indent', 'dedent', 'eof'];
 
-const indented = (lexer: moo.Lexer) => {
+function indented(lexer: moo.Lexer) {
   let iter = peekable(lexer);
   let stack: any[] = [];
   let eof = false;
@@ -114,7 +113,7 @@ const indented = (lexer: moo.Lexer) => {
       return { type: 'dedent', value: 'dedent' };
     }
 
-    return undefined;
+    return;
   };
 
   const save = () => {
@@ -145,7 +144,6 @@ const indented = (lexer: moo.Lexer) => {
   }
 
   return { next, has, formatError, save, reset, feed };
-};
+}
 
 export default indented(moo.compile(lex));
-// const source = readFileSync('.run').toString();
