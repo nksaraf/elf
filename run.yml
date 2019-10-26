@@ -1,0 +1,7 @@
+build: wasm-pack build
+
+install:
+  - cd www && npm install
+
+dev:
+  - cd www && npm run start
