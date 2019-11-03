@@ -1,7 +1,13 @@
-build: wasm-pack build
+// this is a comment
+(( )){} // grouping stuff
+!*+-/=<> <= == // operators
+"abv"
+12
+
+build: "wasm-pack build"
 
 install:
-  - cd www && npm install
+  - "cd www && npm install"
 
 dev:
-  - cd www && npm run start
+  - "cd www && npm run start"
