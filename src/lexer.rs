@@ -354,6 +354,7 @@ pub struct IndentedLexer<'a> {
   child: Lexer<'a>,
   indent: usize,
   stack: Vec<usize>,
+  last: Token,
 }
 
 impl<'a> IndentedLexer<'a> {
@@ -364,6 +365,7 @@ impl<'a> IndentedLexer<'a> {
       child: lexer,
       indent,
       stack: vec![],
+      last: Token::default(),
     }
   }
 }
