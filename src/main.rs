@@ -1,7 +1,12 @@
+#![allow(dead_code)]
+
 use std::env;
 use std::fs;
 mod lexer;
-use lexer::{Lexer, Token, TokenType};
+mod result;
+mod token;
+
+use lexer::TokenIterator;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,10 +29,7 @@ fn run_prompt() {
 }
 
 fn run(source: String) {
-    for token in lexer::Lexer::scan(source) {
-        if token.is(TokenType::EOF) {
-            break;
-        }
+    for token in source.chars().tokens() {
         println!("{:?}", token);
     }
 }

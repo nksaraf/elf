@@ -1,13 +1,13 @@
-// this is a comment
-(( )){} // grouping stuff
-!*+-/=<> <= == // operators
-"abv"
-12
+import cargo
+import sh
 
-build: "wasm-pack build"
+task build:
+  echo("running test3")
+  cargo.build({ 
+    verbose: true,
+    allFeatures: true
+  })
 
-install:
-  - "cd www && npm install"
-
-dev:
-  - "cd www && npm run start"
+task hello_world:
+  sh.run("echo start...")
+  
