@@ -3,10 +3,10 @@
 // Bypasses TS6133. Allow declared but unused functions.
 // @ts-ignore
 function id(d: any[]): any { return d[0]; }
-declare var colon: any;
 declare var indent: any;
-declare var word: any;
 declare var dedent: any;
+declare var colon: any;
+declare var word: any;
 declare var bracket_open: any;
 declare var bracket_close: any;
 declare var nl: any;
@@ -14,6 +14,7 @@ declare var ws: any;
 
 import lexer from './lexer';
 function ast(token: any) {
+  console.log(token);
   return { value: token.value, token };
 }
 
@@ -48,10 +49,10 @@ const grammar: Grammar = {
   ParserRules: [
     {"name": "main$ebnf$1", "symbols": []},
     {"name": "main$ebnf$1", "symbols": ["main$ebnf$1", "task"], "postprocess": (d) => d[0].concat([d[1]])},
-    {"name": "main", "symbols": ["main$ebnf$1"], "postprocess": function(data) { return data[0][0]; }},
-    {"name": "task", "symbols": ["task_header"]},
-    {"name": "task_header", "symbols": ["identifier", "parameter_list", "indentation"], "postprocess": function(data) {return { name: ast(data[0]), params: data[1].map(p => ast(p)) };}},
-    {"name": "indentation", "symbols": ["_?", (lexer.has("colon") ? {type: "colon"} : colon), "br", (lexer.has("indent") ? {type: "indent"} : indent), (lexer.has("word") ? {type: "word"} : word), "br", (lexer.has("dedent") ? {type: "dedent"} : dedent)]},
+    {"name": "main", "symbols": ["main$ebnf$1"]},
+    {"name": "task", "symbols": ["task_header", "_?", (lexer.has("indent") ? {type: "indent"} : indent), "task_body", (lexer.has("dedent") ? {type: "dedent"} : dedent)], "postprocess": function(data) {return { name: ast(data[0][0]), params: data[0][1].map(p => ast(p)), body: ast(data[2]) };}},
+    {"name": "task_header", "symbols": ["identifier", "parameter_list", (lexer.has("colon") ? {type: "colon"} : colon)]},
+    {"name": "task_body", "symbols": [(lexer.has("word") ? {type: "word"} : word), "br"]},
     {"name": "parameter_list$ebnf$1", "symbols": ["parameter"]},
     {"name": "parameter_list$ebnf$1", "symbols": ["parameter_list$ebnf$1", "parameter"], "postprocess": (d) => d[0].concat([d[1]])},
     {"name": "parameter_list", "symbols": ["parameter_list$ebnf$1"]},

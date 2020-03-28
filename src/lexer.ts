@@ -4,7 +4,7 @@ export function peekable(lexer: moo.Lexer) {
   let here: moo.Token | undefined;
 
   const reset = (source: string, state?: moo.LexerState) => {
-    lexer.reset(source, state);
+    lexer.reset(source);
     here = lexer.next();
   };
 
@@ -122,6 +122,9 @@ function indented(lexer: moo.Lexer) {
 
   const reset = (chuck: string, info?: moo.LexerState) => {
     iter.reset(chuck, info);
+    eof = false;
+    token = null;
+    stack = [];
     indent = iter.nextIndent();
   };
 
@@ -130,10 +133,10 @@ function indented(lexer: moo.Lexer) {
   const has = (name: string) => Boolean([...Object.keys(lex), ...types].find(v => v === name));
 
   function feed(source: string) {
-    lexer.reset(source);
+    reset(source);
     const tokens = [];
     while (true) {
-      const c = lexer.next();
+      const c = next();
       if (c && c.type !== 'eof') {
         tokens.push(c);
       } else {
